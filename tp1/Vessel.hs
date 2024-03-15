@@ -1,4 +1,4 @@
-module Vessel ( Vessel, newV, freeCellsV, loadV){-, unloadV, netV )-}
+module Vessel ( Vessel, newV, freeCellsV, loadV, unloadV, netV )
  where
 
 import Container
@@ -13,19 +13,25 @@ newV cantStack capacity ruta= (Ves (replicate cantStack (newS capacity)) ruta)
 freeCellsV :: Vessel -> Int            -- responde la celdas disponibles en el barco
 freeCellsV (Ves stacks route) = sum (map freeCellsS stacks)
 
-
-getStack :: Vessel -> Int -> Stack
-getStack (Ves stacks route) n = stacks !! n
+loadStacks :: [Stack] -> Route ->Container -> [Stack] -- carga un contenedor en una pila
+loadStacks (x:xs) route cont | holdsS x cont route = stackS x cont : xs
+                             | otherwise = x : loadStacks xs route cont
 
 loadV :: Vessel -> Container -> Vessel -- carga un contenedor en el barco
 -- usar freeCellsV, stackS, holdsS
-loadV (Ves stackslist route) cont | (freeCellsV (Ves stackslist route) >= 0) && (holdsS (head stackslist) cont route) = (Ves ([stackS (head stackslist) cont] ++ tail stackslist) route)
-                               | otherwise = error "No se puede cargar el contenedor: Barco lleno o no cumple con la ruta"
+loadV (Ves (x:xs) route) cont = (Ves (loadStacks (x:xs) route cont) route)
 
-{-
+unloadStack :: [Stack] -> String -> [Stack]  -- responde una pila al que se le han descargado los contenedores que podían descargarse en la ciudad
+unloadStack (x:xs) city | length (x:xs) == 1 = (popS x city:xs)
+                        | otherwise= popS x city : unloadStack xs city
+
 unloadV :: Vessel -> String -> Vessel  -- responde un barco al que se le han descargado los contenedores que podían descargarse en la ciudad
--- usar destinationC, popS
+unloadV (Ves (x:xs) route) city = (Ves (unloadStack (x:xs) city) route)
 
 netV :: Vessel -> Int                  -- responde el peso neto en toneladas de los contenedores en el barco
--- usar map y netS
--}
+netV (Ves stacks route) = sum (map netS stacks)
+
+closure :: [Stack] -> Container -> Route -> Bool
+closure [] cont route = False
+closure (x:xs) cont route | (freeCellsS (x) > 0) && (holdsS x cont route) = True
+                          | otherwise = closure xs cont route

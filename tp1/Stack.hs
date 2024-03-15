@@ -1,4 +1,4 @@
-module Stack ( Stack, newS, freeCellsS, stackS, netS, holdsS){-, popS )-}
+module Stack ( Stack, newS, freeCellsS, stackS, netS, holdsS, popS )
  where
 
 import Container
@@ -20,12 +20,17 @@ netS (Sta containers capacity) = sum (map netC containers)
 
 
 holdsS :: Stack -> Container -> Route -> Bool -- indica si la pila puede aceptar el contenedor considerando las ciudades en la ruta
-holdsS (Sta containers capacity) cont route | (inOrderR route (destinationC(last containers)) (destinationC(cont))) && (freeCellsS (Sta containers capacity) > 0) && (netS (Sta containers capacity) + netC(cont) <= 20) = True
+holdsS (Sta containers capacity) cont route | (length containers == 0) && (inOrderR route (destinationC(cont)) (destinationC(cont))) && (netC(cont) <= 20) = True
+                                            | (inOrderR route (destinationC(cont)) (destinationC(last containers))) && (freeCellsS (Sta containers capacity) > 0) && (netS (Sta containers capacity) + netC(cont) <= 20) = True
                                             | otherwise = False
 
 
+canPop :: Stack -> String -> Bool             -- indica si la pila tiene contenedores con destino en la ciudad indicada
+canPop (Sta containers capacity) city | length containers == 0 = False
+                                      | otherwise = destinationC(last containers) == city
 
 popS :: Stack -> String -> Stack              -- quita del tope los contenedores con destino en la ciudad indicada
-popS (Sta containers capacity) city = (Sta (filter (\x -> destinationC(x) /= city) containers) capacity)
+popS (Sta containers capacity) city | canPop (Sta containers capacity) city = ( Sta (filter (\x -> destinationC(x) /= city) containers) capacity)
+                                    | otherwise = (Sta containers capacity)
 -- usar destinationC y filter
 -- filter (\x -> destination(x) /= city containers) muestra los elementos de containers que cumplen la condicion x
