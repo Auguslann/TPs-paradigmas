@@ -26,7 +26,7 @@ holdsS (Sta containers capacity) cont route | (length containers == 0) && (inOrd
 
 
 canPop :: Stack -> String -> Bool             -- indica si la pila tiene contenedores con destino en la ciudad indicada
-canPop (Sta containers capacity) city | length containers == 0 = False
+canPop (Sta containers capacity) city | length containers == 0 = error "No hay contenedores o no hay contenedores con destino en la ciudad indicada"
                                       | otherwise = destinationC(last containers) == city
 
 popS :: Stack -> String -> Stack              -- quita del tope los contenedores con destino en la ciudad indicada

@@ -14,6 +14,7 @@ freeCellsV :: Vessel -> Int            -- responde la celdas disponibles en el b
 freeCellsV (Ves stacks route) = sum (map freeCellsS stacks)
 
 loadStacks :: [Stack] -> Route ->Container -> [Stack] -- carga un contenedor en una pila
+loadStacks [] route cont = []
 loadStacks (x:xs) route cont | holdsS x cont route = stackS x cont : xs
                              | otherwise = x : loadStacks xs route cont
 
