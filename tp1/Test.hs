@@ -1,31 +1,48 @@
+import Container
+import Stack
 import Vessel
 import Route
-import Stack
-import Container
 
+import Control.Exception
+import System.IO.Unsafe
 
-cont2 = newC "Buenos Aires" 10
-cont1 = newC "Rosario" 5
-cont0 = newC "Cordoba" 5
-cont3 = newC "Rosario" 5
-cont4 = newC "Cordoba" 5
-cont5 = newC "Buenos Aires" 10
+mdq = "MDQ"
+rsl = "RSL"
+bhi = "BHI"
+bue = "BUE"
+qeq = "QEQ"
+mvd = "MVD"
 
-stack1 = newS 10
+rutaLarga = newR [ bhi, qeq, mdq, bue, rsl ]
 
-route1 = newR ["Buenos Aires", "Rosario", "Cordoba"]
+bS = newV 1 1 rutaLarga
+bChato = newV 2 1 rutaLarga
+bChatoX = loadV bChato cMdq
+bAlto = newV 1 2 rutaLarga
+bAltoX = loadV bAlto cMdq
 
-vessel0 = newV 2 10 route1
-vessel1 = loadV vessel0 cont0
-vessel2 = loadV vessel1 cont1
-vessel3 = loadV vessel2 cont2
-vessel4 = unloadV vessel3 "Rosario" -- Error
-vessel5 = unloadV vessel4 "Cordoba" -- Error
-vessel6 = unloadV vessel3 "Buenos Aires" -- OK
-vessel7 = loadV vessel6 cont0 -- OK
-vessel8 = loadV vessel7 cont3 -- OK
-vessel9 = loadV vessel8 cont4 -- OK
-vessel10 = loadV vessel9 cont5 -- Error
-vessel11 = unloadV vessel10 "Buenos Aires"
-vessel12 = unloadV vessel11 "Rosario"
-vessel13 = unloadV vessel12 "Cordoba"
+cMdq = newC mdq 5
+cBue = newC bue 7
+cQeq = newC qeq 9
+
+sLL = newS 2
+sXL = stackS sLL cMdq
+sXX = stackS sXL cMdq
+
+t = [ destinationC cMdq == "MDQ", -- "C1 destino de un contenedor"
+      inOrderR rutaLarga bhi qeq, -- "R1 enOrden"
+      inOrderR rutaLarga bhi rsl, -- "R2 enOrden"
+      inOrderR rutaLarga qeq mdq, -- "R3 enOrden"
+      inOrderR rutaLarga qeq rsl, -- "R4 enOrden"
+      testF  (stackS sXX cMdq), -- "S4 una pila no tolera mas que su capacidad"
+      True ]
+
+testF :: Show a => a -> Bool
+testF action = unsafePerformIO $ do
+    result <- tryJust isException (evaluate action)
+    return $ case result of
+        Left _ -> True
+        Right _ -> False
+    where
+        isException :: SomeException -> Maybe ()
+        isException _ = Just ()

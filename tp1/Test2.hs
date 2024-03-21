@@ -32,3 +32,19 @@ vessel8 = loadV vessel7 cont7
 vessel9 = loadV vessel8 cont8
 
 vessel10 = foldr (flip loadV) vessel0 [cont0, cont1, cont2, cont3, cont4, cont5, cont6, cont7, cont8, cont9]
+
+t =[
+    destinationC cont2 == "Buenos Aires",
+    inOrderR route1 "Buenos Aires" "Rosario",
+    inOrderR route1 "Buenos Aires" "Cordoba",
+    inOrderR route1 "Rosario" "Cordoba",
+    not (inOrderR route1 "Rosario" "Buenos Aires"),
+    not (inOrderR route1 "Cordoba" "Buenos Aires"),
+    not (inOrderR route1 "Cordoba" "Rosario"),
+    freeCellsV vessel0 == 2,
+    freeCellsV vessel1 == 1,
+    freeCellsV vessel2 == 0,
+    freeCellsV vessel3 == 1,
+    freeCellsV vessel4 == 2,
+    freeCellsV vessel5 == 2,
+    True]
