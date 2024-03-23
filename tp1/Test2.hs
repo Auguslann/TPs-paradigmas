@@ -1,20 +1,16 @@
+import Container
+import Stack
 import Vessel
 import Route
-import Stack
-import Container
 
+import Control.Exception
+import System.IO.Unsafe
 
-cont2 = newC "Buenos Aires" 10
-cont1 = newC "Rosario" 20
-cont0 = newC "Cordoba" 20
-cont3 = newC "Rosario" 5
-cont4 = newC "Cordoba" 5
-cont5 = newC "Buenos Aires" 10
-cont6 = newC "Buenos Aires" 10
-cont7 = newC "Rosario" 1
-cont8 = newC "Cordoba" 1
-cont9 = newC "Buenos Aires" 1
-
+cont2 = newC "Buenos Aires" 15
+cont1 = newC "Rosario" 5
+cont0 = newC "Cordoba" 5
+cont3 = newC "Cordoba" 25
+cont4 = newC "Belgrano" 5
 
 stack1 = newS 10
 
@@ -24,27 +20,31 @@ vessel0 = newV 2 1 route1
 vessel1 = loadV vessel0 cont0
 vessel2 = loadV vessel1 cont1
 vessel3 = loadV vessel2 cont2
-vessel4 = unloadV vessel3 "Rosario"
-vessel5 = unloadV vessel4 "Cordoba"
-vessel6 = unloadV vessel5 "Buenos Aires"
-vessel7 = loadV vessel6 cont6
-vessel8 = loadV vessel7 cont7
-vessel9 = loadV vessel8 cont8
+vessel4 = loadV vessel0 cont3
+vessel5 = loadV vessel0 cont4
 
-vessel10 = foldr (flip loadV) vessel0 [cont0, cont1, cont2, cont3, cont4, cont5, cont6, cont7, cont8, cont9]
+
+
 
 t =[
-    destinationC cont2 == "Buenos Aires",
-    inOrderR route1 "Buenos Aires" "Rosario",
-    inOrderR route1 "Buenos Aires" "Cordoba",
-    inOrderR route1 "Rosario" "Cordoba",
-    not (inOrderR route1 "Rosario" "Buenos Aires"),
-    not (inOrderR route1 "Cordoba" "Buenos Aires"),
-    not (inOrderR route1 "Cordoba" "Rosario"),
-    freeCellsV vessel0 == 2,
-    freeCellsV vessel1 == 1,
-    freeCellsV vessel2 == 0,
-    freeCellsV vessel3 == 1,
-    freeCellsV vessel4 == 2,
-    freeCellsV vessel5 == 2,
+    destinationC(cont0) == "Cordoba", -- "C1 destino de un contenedor"
+    inOrderR(route1) "Buenos Aires" "Rosario", -- "R1 enOrden"
+    inOrderR(route1) "Buenos Aires" "Cordoba", -- "R2 enOrden"
+    inOrderR(route1) "Rosario" "Cordoba", -- "R3 enOrden"
+    not (inOrderR(route1) "Cordoba" "Buenos Aires"), -- "R4 enOrden"
+    freeCellsV(vessel3) == 0, -- "Vessel 3 no carga cont 2"
+    testF(freeCellsV(vessel4) == 0), -- "Vessel 4 no carga cont 3"
+    netV(vessel0) == netV(vessel5), -- "Vessel 5 no carga cont 0 porque su destino no esta en la ruta"
+    testF(newV (-1) 1 route1), -- "Vessel no acepta cantidades negativas"
     True]
+
+
+testF :: Show a => a -> Bool
+testF action = unsafePerformIO $ do
+    result <- tryJust isException (evaluate action)
+    return $ case result of
+        Left _ -> True
+        Right _ -> False
+    where
+        isException :: SomeException -> Maybe ()
+        isException _ = Just ()
