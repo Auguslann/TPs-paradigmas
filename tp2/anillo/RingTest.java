@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
 
 public class RingTest {
     @Test void test00NextOnEmpty() {
-        Exception e = assertThrows( Exception.class, () -> new Ring().next() );
+        assertThrows( Exception.class, () -> new Ring().next() );
     }
 
     @Test void test01CurrentOnEmpty() {
-        Exception e =assertThrows( Exception.class, () -> new Ring().current() );
+        assertThrows( Exception.class, () -> new Ring().current() );
     }
 
     @Test void test02CurrentAfterAdd() {
