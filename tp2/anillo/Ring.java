@@ -29,14 +29,12 @@ public class Ring {
     }
 
     public Ring next() {
-        nodoActual = (nodoActual != null) ? nodoActual.siguiente : new RuntimeException("El anillo está vacío, no se puede avanzar.");
+        nodoActual = nodoActual.siguiente;
         return this;
     }
 
     public Object current() {
         if (nodoActual != null) {
-            System.out.println("mostrat");
-            System.out.println((nodoActual.valor));
             return nodoActual.valor;
         } else {
             throw new RuntimeException("El anillo está vacío, no hay nodo actual.");
@@ -49,7 +47,6 @@ public class Ring {
             nuevoNodo.siguiente = nuevoNodo;
             nodoActual = nuevoNodo;
         } else {
-            //mostrarnodo();
             Nodo anterior = nodoActual;
             while(anterior.siguiente!=nodoActual){
                 anterior = anterior.siguiente;
@@ -65,7 +62,6 @@ public class Ring {
         //System.out.println(nodoActual.valor);
         if (nodoActual != null) {
             if (nodoActual.siguiente == nodoActual) {
-                System.out.println("No toma una linea");
                 nodoActual = null; // Si solo hay un nodo en el anillo
             } else {
                 Nodo nodoAnterior = nodoActual.anterior;
