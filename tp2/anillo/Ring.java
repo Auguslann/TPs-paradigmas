@@ -9,74 +9,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class Ring {
+public  class Ring {
     private Nodo nodoActual;
 
-    private static class Nodo {
-        Object valor;
-        Nodo siguiente;
-        Nodo anterior;
-
-        Nodo(Object valor) {
-            this.valor = valor;
-            this.siguiente = this;
-            this.anterior = this;
-        }
-    }
-
     public Ring() {
-        nodoActual = null;
+        nodoActual = Nodo.arranca();
     }
 
     public Ring next() {
-        nodoActual = nodoActual.siguiente;
+        nodoActual = nodoActual.next();
         return this;
     }
 
     public Object current() {
-        if (nodoActual != null) {
-            return nodoActual.valor;
-        } else {
-            throw new RuntimeException("El anillo está vacío, no hay nodo actual.");
-        }
+        return nodoActual.current();
     }
 
     public Ring add(Object cargo) {
-        Nodo nuevoNodo = new Nodo(cargo);
-        if (nodoActual == null) {
-            nuevoNodo.siguiente = nuevoNodo;
-            nodoActual = nuevoNodo;
-        } else {
-            Nodo anterior = nodoActual;
-            while(anterior.siguiente!=nodoActual){
-                anterior = anterior.siguiente;
-            }
-            nuevoNodo.siguiente=nodoActual;
-            anterior.siguiente = nuevoNodo;
-            nodoActual = nuevoNodo;
-        }
+        nodoActual = nodoActual.add(cargo);
         return this;
     }
 
     public Ring remove() {
-        //System.out.println(nodoActual.valor);
-        if (nodoActual != null) {
-            if (nodoActual.siguiente == nodoActual) {
-                nodoActual = null; // Si solo hay un nodo en el anillo
-            } else {
-                Nodo nodoAnterior = nodoActual.anterior;
-                Nodo nodoSiguiente = nodoActual.siguiente;
-                nodoAnterior.siguiente = nodoSiguiente;
-                nodoSiguiente.anterior= nodoAnterior;
-                nodoActual = nodoSiguiente;
-
-            }
-        }
+        nodoActual = nodoActual.remove();
         return this;
     }
-    private RuntimeException throwRuntimeException(String mensaje) {
-        return new RuntimeException(mensaje);
-    }
-    }
+}
 
 
