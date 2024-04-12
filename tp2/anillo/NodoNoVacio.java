@@ -1,13 +1,13 @@
 package anillo;
-class NodoAmigo extends Nodo{
+class NodoNoVacio extends NodoPadre {
     private Object valor;
-    private NodoAmigo siguiente;
-    NodoAmigo(Object valor) {
+    private NodoNoVacio siguiente;
+    NodoNoVacio(Object valor) {
         this.valor = valor;
         siguiente = this;
     }
-    public Nodo add(Object cargo) {
-        NodoAmigo nuevo = new NodoAmigo(cargo);
+    public NodoPadre add(Object cargo) {
+        NodoNoVacio nuevo = new NodoNoVacio(cargo);
         Object current = this.current();
         this.valor = cargo;
         nuevo.siguiente = this.siguiente;
@@ -15,11 +15,11 @@ class NodoAmigo extends Nodo{
         nuevo.valor = current;
         return this;
     }
-    public Nodo next(){
+    public NodoPadre next(){
         return this.siguiente;
     }
-    public Nodo remove(){
-        return (this.siguiente == this) ? new NodoToxi() : this.siguiente;
+    public NodoPadre remove(){
+        return (this.siguiente == this) ? new NodoVacio() : this.siguiente;
     }
     public Object current(){
         return this.valor;

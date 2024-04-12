@@ -1,37 +1,28 @@
 package anillo;
 
-import jdk.javadoc.doclet.Doclet;
-
-import javax.naming.CannotProceedException;
-import javax.swing.undo.CannotRedoException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 public  class Ring {
-    private Nodo nodoActual;
+    private NodoPadre nocoActual;
 
     public Ring() {
-        nodoActual = Nodo.arranca();
+        nocoActual = NodoPadre.arranca();
     }
 
     public Ring next() {
-        nodoActual = nodoActual.next();
+        nocoActual = nocoActual.next();
         return this;
     }
 
     public Object current() {
-        return nodoActual.current();
+        return nocoActual.current();
     }
 
     public Ring add(Object cargo) {
-        nodoActual = nodoActual.add(cargo);
+        nocoActual = nocoActual.add(cargo);
         return this;
     }
 
     public Ring remove() {
-        nodoActual = nodoActual.remove();
+        nocoActual = nocoActual.remove();
         return this;
     }
 }
