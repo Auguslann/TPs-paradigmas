@@ -1,11 +1,7 @@
 package anillo;
 
 public  class Ring {
-    private NodoPadre nocoActual;
-
-    public Ring() {
-        nocoActual = NodoPadre.arranca();
-    }
+    private NodoPadre nocoActual = NodoPadre.arranca();
 
     public Ring next() {
         nocoActual = nocoActual.next();
