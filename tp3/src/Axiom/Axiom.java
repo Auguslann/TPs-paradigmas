@@ -3,65 +3,54 @@ package Axiom;
 import java.util.List;
 
 public class Axiom {
-    Dron dron;
-    public Axiom() {
-        this.dron = new AxiomQuieto();
-    }
-    public Dron Orders(char orden) {
-        dron = dron.Orders(orden);
-        return dron;
-    }
-    public int Speed() {
-        return dron.Speed();
-    }
-    public String getDirection() {
-        return dron.getDirection();
-    }
 
-//    public Integer speed;
-//    public String sonda;
-//    public String sondaoff = "Sonda desplegada";
-//    public String sondaon = "Sonda recuperada";
-//    public List<String> directions = List.of("Norte", "Este", "Sur", "Oeste");
-//    public Axiom(){
-//        speed = 0;
-//    }
-//    public int Speed(){
-//        return speed;
-//    }
-//
-//    public Axiom Orders(char orden){
-//        if(orden == 'i') {
-//            speed++;
-//            return this;
-//        }
-//        if(orden == 's' && speed > 0) {
-//            speed--;
-//            return this;
-//        }
-//        if(orden == 'l') {
-//            directions = List.of(directions.get(3), directions.get(0), directions.get(1), directions.get(2));
-//        }
-//        if(orden == 'r') {
-//            directions = List.of(directions.get(1), directions.get(2), directions.get(3), directions.get(0));
-//        }
-//        if(orden == 'd') {
-//            if (speed == 0){
-//                throw new RuntimeException("Too Slow");
-//            }
-//            sonda = sondaoff;
-//        }
-//        if(orden == 'f') {
-//            sonda = sondaon;
-//        }
-//        return this;
-//
-//    }
-//    public String getDirection(){
-//        return directions.getFirst();
-//    }
-//
-//    public String getSonda() {
-//        return sonda;
-//    }
+    public class Drone {
+        public Speed speed = new Speed.Static();
+        public Sonda sonda = new Sonda.SondaRecuperada();
+        public Brujula direction = new Brujula.Norte();
+
+
+    }
+    public Drone drone = new Drone();
+    public int Speed(){
+        return drone.speed.getSpeed();
+    }
+    public Axiom Orders(char orden){
+        if(orden == 'i') {
+            drone.speed = drone.speed.addSpeed();
+            return this;
+        }
+        if(orden == 's') {
+            drone.speed = drone.speed.subSpeed();
+            return this;
+        }
+        if(orden == 'l') {
+            drone.sonda = drone.sonda.left();
+            drone.direction = drone.direction.left();
+            return this;
+        }
+        if(orden == 'r') {
+            drone.sonda = drone.sonda.right();
+            drone.direction = drone.direction.right();
+            return this;
+        }
+        if(orden == 'd') {
+            drone.speed.candeploy();
+            drone.sonda = drone.sonda.desplegarSonda();
+            return this;
+        }
+        if(orden == 'f') {
+            drone.sonda = drone.sonda.recuperarSonda();
+            return this;
+        }
+        return this;
+
+    }
+    public String getDirection(){
+        return drone.direction.getDirection();
+    }
+    public String getSonda() {
+        return drone.sonda.getSonda();
+    }
 }
+

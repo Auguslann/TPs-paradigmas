@@ -11,40 +11,45 @@ public class DronTest {
     public void test() {
         Axiom dron = new Axiom();
         speedAndDirection(dron, 0, "Norte");
-        assertNotNull(dron);
     }
 
 
     @Test
     public void test2() {
         Axiom dron = new Axiom();
-        speedAndDirection(dron,0,"Norte");
+        dron.Orders('l');
+        speedAndDirection(dron,0,"Oeste");
         assertEquals("Sonda desplegada", dron.Orders('i').Orders('i').Orders('d').getSonda());
+        dron.Orders('f').Orders('r');
         speedAndDirection(dron,2,"Norte");
     }
-    @Test public void test03(){
-        assertEquals("Oeste",new Axiom().Orders('l').getDirection());
-    }
     @Test public void test4(){
-        assertEquals("Este",new Axiom().Orders('i').Orders('r').Orders('l').getDirection());
+        assertEquals("Norte",new Axiom().Orders('i').Orders('r').Orders('l').getDirection());
     }
     @Test public void test05(){
         assertEquals(0 ,new Axiom().Orders('s').Speed() );
     }
     @Test public void test06(){
         Axiom boat = new Axiom();
-        assertThrowsLike( "Too Slow", () -> boat.Orders('d'));
+        assertThrowsLike( "Can't deploy it it's not moving", () -> boat.Orders('d'));
     }
     @Test public void test07(){
         Axiom boat = new Axiom();
         assertEquals(0,boat.Orders('i').Orders('s').Speed());
+    }
+    @Test public void test08(){
+        Axiom dorn = new Axiom();
+        assertEquals("Sonda recuperada",dorn.Orders('i').Orders('d').Orders('f').getSonda());
+    }
+    @Test public void test09(){
+        assertThrowsLike("Can't turn with the probe deployed",() ->new Axiom().Orders('i').Orders('d').Orders('r'));
     }
     private static void speedAndDirection(Axiom dron, int expected_speed, String expected_direction) {
         assertEquals(expected_speed, dron.Speed());
         assertEquals(expected_direction, dron.getDirection());
     }
 
-    private void assertThrowsLike(String message, Executable codeBlock){
-        assertEquals(message,assertThrows( Exception.class , codeBlock ).getMessage());
+    private void assertThrowsLike(String message, Executable codeBlock) {
+        assertEquals(message, assertThrows(Exception.class, codeBlock).getMessage());
     }
 }
