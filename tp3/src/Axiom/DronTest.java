@@ -44,6 +44,9 @@ public class DronTest {
     @Test public void test09(){
         assertThrowsLike("Can't turn with the probe deployed",() ->new Axiom().Orders('i').Orders('d').Orders('r'));
     }
+    @Test public void test10(){
+        assertThrowsLike("Can't decrease speed with the probe deployed",() ->new Axiom().Orders('i').Orders('d').Orders('s'));
+    }
     private static void speedAndDirection(Axiom dron, int expected_speed, String expected_direction) {
         assertEquals(expected_speed, dron.Speed());
         assertEquals(expected_direction, dron.getDirection());
