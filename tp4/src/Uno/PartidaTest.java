@@ -1,4 +1,3 @@
-
 package Uno;
 
 import org.junit.jupiter.api.Test;
@@ -16,439 +15,180 @@ import java.util.AbstractMap.SimpleEntry;
 
 
 public class PartidaTest {
-    LinkedList<SimpleEntry<String, List<Carta>>> listaVacia = new LinkedList<>();
+    List<Carta> deck = new ArrayList<>(Arrays.asList( new NumberCard(2, "Red"), new NumberCard(2, "Blue"), new NumberCard(2, "Green"), new NumberCard(2, "Yellow")));
+    List<Carta> player1Cards = new ArrayList<>(Arrays.asList( new SkipCard("Blue"),new NumberCard(1, "Red"), new NumberCard(1, "Blue"),new Plus2Card("Blue")));
+    List<Carta> player2Cards = new ArrayList<>(Arrays.asList( new SkipCard("Blue"),new NumberCard(1, "Red"), new NumberCard(1, "Blue"),new Plus2Card("Blue")));
+    List<Carta> player3Cards = new ArrayList<>(Arrays.asList( new NumberCard(1, "Red"), new NumberCard(1, "Green"), new Plus2Card("Red")));
+    List<Carta> list1 = new ArrayList<>(Arrays.asList(new NumberCard(1, "Blue"), new NumberCard(3, "Blue"), new SkipCard("Blue"), new Plus2Card("Red"),new WildCard( ""), new ReverseCard("Blue")));
+    LinkedList<SimpleEntry<String, List<Carta>>> playerCards = new LinkedList<>(Arrays.asList(
+            new SimpleEntry<>("Player1", player1Cards),
+            new SimpleEntry<>("Player2", player2Cards)));
+    LinkedList<SimpleEntry<String, List<Carta>>> playerCards3players = new LinkedList<>(Arrays.asList(
+            new SimpleEntry<>("Player1", list1),
+            new SimpleEntry<>("Player2", player2Cards),
+            new SimpleEntry<>("Player3", player3Cards)));
 
-    List<Carta> emptyDeck = new LinkedList<>();
+    List<Carta> player1forUNO = new ArrayList<>(Arrays.asList( new NumberCard(1, "Red"), new NumberCard(1, "Yellow")));
+    List<Carta> player2forUNO = new ArrayList<>(Arrays.asList( new NumberCard(1, "Red"),new NumberCard(1, "Red")));
+    LinkedList<SimpleEntry<String, List<Carta>>> playerCardsUNO = new LinkedList<>(Arrays.asList(
+            new SimpleEntry<>("Player1", player1forUNO),
+            new SimpleEntry<>("Player2", player2forUNO)));
 
-    List<Carta> list1 = new ArrayList<>(Arrays.asList(getNumericCard(1, "Red"), getNumericCard(3, "Blue"), getSkipCard("Green"), getPlusTwoCard("Red"), getReverseCard("Red")));
 
-    private static reverse getReverseCard(String color) {
-        return new reverse(color);
+    @Test void testStartGame() {
+        LinkedList<SimpleEntry<String, List<Carta>>> playerCards = new LinkedList<>();
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        assertEquals("Game has not started yet.", partida.getState().getMessage());
     }
-
-    private static skip getSkipCard(String color) {
-        return new skip(color);
-    }
-
-    List<Carta> list2 = new ArrayList<>(Arrays.asList(getNumericCard(3, "Red"), getNumericCard(4, "Blue"), getNumericCard(3, "Green"), getChangeColorCard(), getPlusTwoCard("Blue")));
-
-    private static WildCard getChangeColorCard() {
-        return new WildCard("").blue();
-    }
-
-    List<Carta> list3 = new ArrayList<>(Arrays.asList(getNumericCard(9, "Green"), getNumericCard(8, "Blue"), getNumericCard(7, "Red"), getChangeColorCard(), getPlusTwoCard("Yellow"), getReverseCard("Blue")));
-
-    private static plusTwo getPlusTwoCard(String color) {
-        return new plusTwo(color);
-    }
-
-    LinkedList<SimpleEntry<String, List<Carta>>> listaConCartas = new LinkedList<>(
-            Arrays.asList(
-                    new SimpleEntry<>("A", list1),
-                    new SimpleEntry<>("B", list2)
-            )
-    );
-
-    List<Carta> deck1 = new ArrayList<>(Arrays.asList(getNumericCard(7, "Yellow"), getNumericCard(8, "Blue"), getNumericCard(5, "Green"), getNumericCard(9, "Red"), getNumericCard(0, "Yellow"), getNumericCard(3, "Blue"), getNumericCard(4, "Green"), getNumericCard(2, "Red"), getNumericCard(1, "Yellow"), getNumericCard(6, "Blue")));
-
-    LinkedList<SimpleEntry<String, List<Carta>>> cartas3Jugadores = new LinkedList<>(
-            Arrays.asList(
-                    new SimpleEntry<>("A", list1),
-                    new SimpleEntry<>("B", list2),
-                    new SimpleEntry<>("C", list3)
-            )
-    );
-
-    List<Carta> listUNO1 = new ArrayList<>(Arrays.asList(getNumericCard(1, "Red"), getNumericCard(3, "Blue")));
-    List<Carta> listUNO2 = new ArrayList<>(Arrays.asList(getNumericCard(3, "Red"), getNumericCard(4, "Blue")));
-
-    LinkedList<SimpleEntry<String, List<Carta>>> listUnoCase = new LinkedList<>(
-            Arrays.asList(
-                    new SimpleEntry<>("A", listUNO1),
-                    new SimpleEntry<>("B", listUNO2)
-            )
-    );
-
-
-    @Test void getFirstState() {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        assertEquals("Game has not started yet.", getMessageFromPartida(partida));
-    }
-
-    @Test void checkPlayers2StartError() {
-        Partida partida = new Partida(listaVacia, emptyDeck);
-        assertThrowsLike(() -> partida.startGame(), "Not enough players to start the game.");
-    }
-
-    @Test void checkPlayers2Start() {
-        assertEquals("Game is being played.", getMessageFromPartida(new Partida(listaConCartas, emptyDeck).startGame()));
-    }
-
-    @Test void headInsertion(){
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Red");
-        assertEquals(partida.startGame().setTopCard(head).head, head);
-    }
-
-    @Test void headInsertionErrorPlayersUndefined(){
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Red");
-        assertThrowsLike(() -> partida.setTopCard(head), "Define Players Before");
-    }
-
-    @Test void startWhenPutting() {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Red");
-        assertThrowsLike(() -> partida.startGame().setTopCard(head).startGame(), "Game is already being played.");
-    }
-
-    @Test void setHeadWhenPutting(){
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Red");
-        assertThrowsLike(() -> partida.startGame().setTopCard(head).setTopCard(head), "Can't randomly set head. Let player play.");
-    }
-
-    @Test void playerDoesntExist(){
-        assertDifferentGameErrors(5, "Red", 3, "Blue", "C", "Player not found.");
-    }
-
-    @Test void improperTurnPutting() {
-        assertDifferentGameErrors(5, "Red", 4, "Blue", "B", "Wrong player turn.");
-    }
-
-    @Test void playerDoesNotHaveCard() {
-        assertDifferentGameErrors(5, "Red", 5, "Red", "A", "Player does not have that card.");
-    }
-
-    @Test void playerWrongCardPlaced() {
-        assertDifferentGameErrors(5, "Red", 3, "Blue", "A", "Invalid card");
-    }
-
-    @Test void testPlayerCanPlayCardColor() {
-        initializeGameAndPlayCardWithDifferentHead(5, "Red");
-    }
-
-    @Test void testPlayerCanPlayCardNumero() {
-        initializeGameAndPlayCardWithDifferentHead(1, "Green");
-    }
-
-    @Test void testNumericCorrectTurnSwap() {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        assertEquals("B", partida.getCurrentPlayerName());
-        partida.playCard(getNumericCard(3, "Red"), "B");
-        assertEquals("A", partida.getCurrentPlayerName());
-    }
-
-    @Test void swapTurn4SkipCard() {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Green");
-        Carta aJugar = getSkipCard("Green");
-
-        partida.startGame().setTopCard(head).playCard(aJugar, "A");
-
-        assertEquals(partida.getCurrentPlayerName(), "A");
-        assertEquals(partida.head.getValor(), "Skip");
-    }
-
-
-    @Test void swapTurn4ColorChange() {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(5, "Red");
-        Carta aJugar = getNumericCard(1, "Red");
-        partida.startGame().setTopCard(head).playCard(aJugar, "A");
-        Carta head2 = getChangeColorCard();
-
-        partida.playCard(head2, "B");
-        assertEquals(partida.head.getColor(), "Blue");
-    }
-
-    @Test void drawCard(){
-        Partida partida = new Partida(listaConCartas, deck1);
-        Carta head = getNumericCard(5, "Red");
-        Carta drawn = getNumericCard(7, "Yellow");
-        partida.startGame().setTopCard(head).drawCard("A");
-
-        // Get the desired player's hand
-        Carta cardToCompare = checkContentionOnly(partida, drawn, "A");
-
-        assertEquals(cardToCompare.getValor(),7);
-        assertEquals(cardToCompare.getColor(),"Yellow");
-    }
-
-
-    @Test void testPlusTwoCard() {
-        Partida partida = new Partida(listaConCartas, deck1);
-        Carta head = getNumericCard(6, "Red");
-        Carta plusTwoCard = getPlusTwoCard("Red");
-        Carta jugarB = getNumericCard(3, "Red");
-
-        // Start the game and set the head
+    @Test void testSetHead() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Red");
         partida.startGame().setTopCard(head);
-
-        // Player A plays the "Plus 2" card
-        partida.playCard(plusTwoCard, "A");
-
-        Carta drawn1 = deck1.get(0);
-        Carta drawn2 = deck1.get(1);
-
-        partida.playCard(jugarB, "B");
-
-        Carta cardToCompare1 = checkContentionOnly(partida, drawn1, "B");
-        Carta cardToCompare2 = checkContentionOnly(partida, drawn2, "B");
-
-        assertEquals(cardToCompare1.getValor(), 7);
-        assertEquals(cardToCompare1.getColor(), "Yellow");
-
-        assertEquals(cardToCompare2.getValor(), 8);
-        assertEquals(cardToCompare2.getColor(), "Blue");
-
+        assertEquals(head, partida.head);
     }
-
-
-    @Test void testPlusTwoCardContinued() {
-        Partida partida = new Partida(listaConCartas, deck1);
-        Carta head = getNumericCard(6, "Red");
-        Carta plusTwoCard = getPlusTwoCard("Red");
-        Carta jugarB = getPlusTwoCard("Blue");
-        Carta jugarA = getNumericCard(3, "Blue");
-
-        // Start the game and set the head
+    @Test void getCurrentPlayerName() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        partida.startGame();
+        assertEquals("Player1", partida.getCurrentPlayerName());
+    }
+    @Test void getNextPlayerName() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Red");
         partida.startGame().setTopCard(head);
-
-        // Player A plays the "Plus 2" card
-        partida.playCard(plusTwoCard, "A");
-
-        Carta drawn1 = deck1.get(0);
-        Carta drawn4 = deck1.get(3);
-
-        partida.playCard(jugarB, "B");
-
-        partida.playCard(jugarA, "A");
-
-        Carta cardToCompare1 = checkContentionOnly(partida, drawn1, "A");
-        Carta cardToCompare2 = checkContentionOnly(partida, drawn4, "A");
-
-        assertEquals(cardToCompare1.getValor(), 7);
-        assertEquals(cardToCompare1.getColor(), "Yellow");
-
-        assertEquals(cardToCompare2.getValor(), 9);
-        assertEquals(cardToCompare2.getColor(), "Red");
-
+        assertEquals("Player1", partida.getCurrentPlayerName());
+        partida.nextTurn();
+        assertEquals("Player2", partida.getCurrentPlayerName());
     }
-
-    @Test void testReverseCard() {
-        Partida partida = new Partida(cartas3Jugadores, deck1);
-        Carta head = getNumericCard(6, "Red");
-        Carta reverseCard = getReverseCard("Red");
-        Carta jugarC = getNumericCard(7, "Red");
-
+    @Test void testPlayCard() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(1, "Blue");
         partida.startGame().setTopCard(head);
-
-        partida.playCard(reverseCard, "A");
-
-        partida.playCard(jugarC, "C");
-        assertEquals(partida.head.getValor(), 7);
-
+        partida.play(card, "Player1", "Blue");
+        assertEquals("Blue", partida.head.color);
+        assertEquals(1, partida.head.getValor());
+        assertEquals(3, partida.getPlayerCards("Player1"));
     }
-
-    @Test void testDoubleReverseCard() {
-        Partida partida = new Partida(cartas3Jugadores, deck1);
-        Carta head = getNumericCard(6, "Red");
-        Carta reverseCardA = getReverseCard("Red");
-        Carta reverseCardC = getReverseCard("Blue");
-        Carta jugarA = getNumericCard(3, "Blue");
-
+    @Test void testRemovingAfterPlaying() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(1, "Blue");
         partida.startGame().setTopCard(head);
-
-        partida.playCard(reverseCardA, "A");
-        partida.playCard(reverseCardC, "C");
-
-        partida.playCard(jugarA, "A");
-        assertEquals(partida.head.getValor(), 3);
-
+        partida.play(card, "Player1", "Red");
+        assertEquals(3, partida.getPlayerCards("Player1"));
     }
-
-    @Test void getUNOState() {
-        Partida partida = new Partida(listUnoCase, emptyDeck);
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        List<Carta> playerHandA = getPlayerHand(partida, "A");
-
-        partida.playCard(getNumericCard(3, "Red"), "B");
-
-        List<Carta> playerHandB = getPlayerHand(partida, "B");
-
-
-        assertTrue(playerHandA.get(0).unoState);
-        assertTrue(playerHandB.get(0).unoState);
-
-
-    }
-
-    @Test void returnUNOIfDraw() {
-        Partida partida = new Partida(listUnoCase, deck1); // Podria hacer un test de deck...
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        partida.playCard(getNumericCard(3, "Red"), "B");
-
-        partida.drawCard("A");
-
-        List<Carta> playerHandA = getPlayerHand(partida, "A");
-
-        assertFalse(playerHandA.get(0).unoState);
-
-    }
-
-    @Test void shoutUNOToMe() {
-        Partida partida = new Partida(listUnoCase, deck1); // Podria hacer un test de deck...
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        partida.personalUNO("A");
-
-        List<Carta> playerHandA = getPlayerHand(partida, "A");
-
-        assertFalse(playerHandA.get(0).unoState);
-    }
-
-    @Test void shoutUNOToOthers() {
-        Partida partida = new Partida(listUnoCase, deck1); // Podria hacer un test de deck...
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        partida.shoutUNOTo("A");
-
-        int actualCardCount = getActualCardCountForPlayer(partida, "A");
-
-        assertEquals(3, actualCardCount);
-
-    }
-
-    @Test void multipleUNOOperations() {
-        Partida partida = new Partida(listUnoCase, deck1); // Podria hacer un test de deck...
-
-        startGameWithGreen1HeadAndPlayRed1Card(partida);
-
-        partida.personalUNO("A").shoutUNOTo("B").shoutUNOTo("A");
-
-        partida.playCard(getNumericCard(3, "Red"), "B");
-        partida.shoutUNOTo("B");
-
-        int actualCardCount = getActualCardCountForPlayer(partida, "B");
-
-        assertEquals(3, actualCardCount);
-    }
-
-    @Test void finishGame() {
-        Partida partida = new Partida(listUnoCase, deck1); // Podria hacer un test de deck...
-
-        Carta head = getNumericCard(1, "Green");
+    @Test void testPlayCardInvalid() {
+        List<Carta> deck = new ArrayList<>();
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(3, "Blue");
         partida.startGame().setTopCard(head);
-
-        Carta cardToPlay = getNumericCard(1, "Red"); // Assuming player A has this card
-        partida.playCard(cardToPlay, "A").playCard(getNumericCard(3, "Red"), "B");
-
-        assertThrowsLike(()->partida.playCard(getNumericCard(3,"Blue"), "A").drawCard("B"), "Game is over.");
+        assertThrows(RuntimeException.class, () -> partida.play(card, "Player1", ""));
     }
 
-    private static Carta getNumericCard(int valor, String color) {
-        Carta head = new CartaNumerica(valor, color);
-        return head;
-    }
-
-
-    private Partida PartidaConListaVaciaYDeckVacio() {
-        Partida partida = new Partida(listaConCartas, emptyDeck);
-        return partida;
-    }
-
-    private void assertDifferentGameErrors(int valorH, String colorH, int valorJ, String colorJ, String desiredPlayer, String errorMessage) {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-        Carta head = getNumericCard(valorH, colorH);
-        Carta aJugar = getNumericCard(valorJ, colorJ);
-        AssertDiferentPLayersAndCards(partida, head, aJugar, desiredPlayer, errorMessage);
-    }
-
-    private void AssertDiferentPLayersAndCards(Partida partida, Carta head, Carta aJugar, String desiredPlayer, String errorMessage) {
-        assertThrowsLike(()-> partida.startGame().setTopCard(head).playCard(aJugar, desiredPlayer), errorMessage);
-    }
-
-    private static String getMessageFromPartida(Partida partida) {
-        return partida.getState().getMessage();
-    }
-
-    private static void AssertCardPLayedAndHeadValue(Partida partida, Carta cardToPlay,String desiredPlayer, int headValor, String headColor, String errorMessage) {
-        assertEquals(headValor,1);
-
-        assertFalse(partida.playerCards.stream()
-                .filter(entry -> entry.getKey().equals(desiredPlayer))
-                .findFirst()
-                .get()
-                .getValue()
-                .contains(cardToPlay), errorMessage);
-    }
-
-    private void initializeGameAndPlayCardWithDifferentHead(int valorH, String colorH) {
-        Partida partida = PartidaConListaVaciaYDeckVacio();
-
-        Carta head = getNumericCard(valorH, colorH);
+    @Test void testSkipCard() {
+        Partida partida = new Partida(playerCards, deck);
+        Carta head = new NumberCard(1, "Blue");
+        Carta card = new SkipCard( "Blue");
         partida.startGame().setTopCard(head);
-
-        Carta cardToPlay = getNumericCard(1, "Red"); // Assuming player A has this card
-        partida.playCard(cardToPlay, "A");
-
-        AssertCardPLayedAndHeadValue(partida, cardToPlay,"A", 1, "Red", "Player A was not able to play the card.");
+        partida.play(card, "Player1", "Blue");
+        assertEquals("Player1", partida.getCurrentPlayerName());
+    }
+    @Test void test3players(){
+        Partida partida = new Partida(playerCards3players, deck);
+        Carta head = new NumberCard(1, "Blue");
+        Carta card = new NumberCard(1, "Blue");
+        partida.startGame().setTopCard(head);
+        assertEquals("Player1", partida.getCurrentPlayerName());
+        partida.play(card, "Player1", "Blue");
+        assertEquals("Player2", partida.getCurrentPlayerName());
+        partida.nextTurn();
+        assertEquals("Player3", partida.getCurrentPlayerName());
+        partida.nextTurn();
+        assertEquals("Player1", partida.getCurrentPlayerName());
+    }
+    @Test void testSkipCardWith3Players() {
+        Partida partida = new Partida(playerCards3players, deck);
+        Carta head = new NumberCard(1, "Blue");
+        Carta card = new SkipCard( "Blue");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Blue");
+        assertEquals("Player3", partida.getCurrentPlayerName());
+        partida.nextTurn();
+        assertEquals("Player1", partida.getCurrentPlayerName());
+        partida.nextTurn();
+        assertEquals("Player2", partida.getCurrentPlayerName());
     }
 
-    private static List<Carta> getPlayerHand(Partida partida, String player) {
-        List<Carta> playerHandA = partida.playerCards.stream()
-                .filter(entry -> entry.getKey().equals(player))
-                .findFirst()
-                .map(SimpleEntry::getValue)
-                .orElseThrow(() -> new RuntimeException("Player not found."));
-        return playerHandA;
+    @Test void testReverseCardWith3Players() {
+        Partida partida = new Partida(playerCards3players, deck);
+        Carta head = new NumberCard(1, "Blue");
+        Carta card = new ReverseCard( "Blue");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Blue");
+        assertEquals("Player3", partida.getCurrentPlayerName());
     }
-
-    private static int getActualCardCountForPlayer(Partida partida, String player) {
-        int actualCardCount = partida.playerCards.stream()
-                .filter(entry -> entry.getKey().equals(player))
-                .findFirst()
-                .map(entry -> entry.getValue().size())
-                .orElse(0);
-        return actualCardCount;
+    @Test void testWildCard(){
+        Partida partida = new Partida(playerCards3players, deck);
+        Carta head = new NumberCard(1, "Blue");
+        Carta card = new WildCard("");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Red");
+        assertEquals("Red", partida.head.color);
     }
-
-    private static void startGameWithGreen1HeadAndPlayRed1Card(Partida partida) {
-        Carta head = getNumericCard(1, "Green");
-        partida.startGame().setHead(head);
-
-        Carta cardToPlay = getNumericCard(1, "Red"); // Assuming player A has this card
-        partida.playCard(cardToPlay, "A");
+    @Test void testP2Card(){
+        Partida partida = new Partida(playerCards3players, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new Plus2Card( "Red");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Red");
+        assertEquals(6, partida.getPlayerCards("Player2"));
+        Carta card2 = new Plus2Card("Blue");
+        partida.play(card2, "Player2", "Blue");
+        assertEquals(5, partida.getPlayerCards("Player3"));
     }
+    @Test void testSayOneWrongly(){
+        Partida partida = new Partida(playerCardsUNO, deck);
+        Carta head = new NumberCard(1, "Red");
+        partida.startGame().setTopCard(head);
+        assertThrowsLike( () -> partida.sayUNO("Player2"),"Player not found/has more than 1 card.");
+    }
+    @Test void testSaidOne(){
+        Partida partida = new Partida(playerCardsUNO, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(1, "Red");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Red");
+        partida.sayUNO("Player1");
 
-    private static Carta checkContentionOnly(Partida partida, Carta drawn, String desiredPlayer) {
-        List<Carta> playerHand = partida.playerCards.stream()
-                .filter(entry -> entry.getKey().equals(desiredPlayer))
-                .findFirst()
-                .map(SimpleEntry::getValue)
-                .orElseThrow(() -> new RuntimeException("Player not found."));
-
-        Carta cardToCompare = playerHand.stream()
-                .filter(playerCard -> playerCard.getColor().equals(drawn.getColor()) && playerCard.getValor() == drawn.getValor())
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Player does not have that card."));
-        return cardToCompare;
+    }
+    @Test void testNoSaidOne(){
+        Partida partida = new Partida(playerCardsUNO, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(1, "Red");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Red");
+        partida.sayUNOto("Player1");
+    }
+    @Test void testEndGame() {//like the avengers
+        Partida partida = new Partida(playerCardsUNO, deck);
+        Carta head = new NumberCard(1, "Red");
+        Carta card = new NumberCard(1, "Red");
+        Carta card2 = new NumberCard(1,"Yellow");
+        partida.startGame().setTopCard(head);
+        partida.play(card, "Player1", "Red");
+        partida.play(card, "Player2", "Red");
+        partida.play(card2, "Player1", "Yellow");
+        assertThrowsLike( () -> partida.play(card, "Player2", "Red"),"Game has already ended.");
     }
 
     private void assertThrowsLike(Executable runnable, String errorMessage){
         assertEquals( assertThrows( Exception.class, runnable) .getMessage(), errorMessage);
     }
-
-
-
 }

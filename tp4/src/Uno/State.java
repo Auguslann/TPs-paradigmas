@@ -1,24 +1,113 @@
 package Uno;
-
-import java.util.List;
 import java.util.Optional;
 
+
 public abstract class State {
+
+    protected Partida partida;
+    protected String message;
+
+
     public abstract String getMessage();
     public abstract State startGame();
-    public abstract State setTopCard(Carta carta);
+    public abstract State setHead(Carta head);
     public abstract Partida playCard(Carta card, String desiredPlayer);
     public abstract Partida nextTurn();
-    public abstract Partida swapDirection();
     public abstract void checkTurn(String desiredPlayer);
-}
+    public abstract String getCurrentPlayer();
+    public abstract State swapTurns();
 
-class EmptyGame extends State {
+
+}
+class NoPlayers extends State{
     String message = "Game has not started yet.";
 
     Partida partida;
+    public NoPlayers(Partida partida) {
+        this.partida = partida;
+        partida.turnos = new EmptyTurns(partida);
+        partida.turnos.left = partida.turnos;
+        partida.turnos.right = partida.turnos;
+    }
 
-    public EmptyGame(Partida partida) {
+    public String getMessage() {
+        return message;
+    }
+
+    public State startGame(){
+        return Optional.ofNullable(partida.getMinNumberPLayers() ? new FirstCard(partida) : null)
+                .orElseThrow(() -> new RuntimeException("Not enough players to start the game."));
+    }
+
+    public State setHead(Carta head) {
+        throw new RuntimeException("Define Players Before");
+    }
+
+    public Partida playCard(Carta card, String desiredPlayer) {
+        throw new RuntimeException("Game has not started yet.");
+    }
+
+    public Partida nextTurn() {
+        throw new RuntimeException("Game has not started yet.");
+    }
+
+    public void checkTurn(String desiredPlayer) {}
+
+    public String getCurrentPlayer() {
+        throw new RuntimeException("Game has not started yet.");
+    }
+    public State swapTurns() {
+        throw new RuntimeException("Game has not started yet.");
+    }
+}
+class FirstCard extends State{
+    String message = "Game has started, waiting for the first card to be played.";
+
+    Partida partida;
+    public FirstCard(Partida partida) {
+        this.partida = partida;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public State startGame(){
+        throw new RuntimeException("Game has already started.");
+    }
+
+    public State setHead(Carta head) {
+        partida.head = head;
+
+        return new Playing(partida);
+    }
+
+    public Partida playCard(Carta card, String desiredPlayer) {
+        throw new RuntimeException("Game has not started yet.");
+    }
+
+    public Partida nextTurn() {
+        partida.turnos = partida.turnos.nextTurn();
+        return partida;
+    }
+
+    public void checkTurn(String desiredPlayer) {
+        this.partida.turnos.checkTurn(desiredPlayer);
+    }
+
+    public String getCurrentPlayer() {
+        return partida.turnos.currentPlayer();
+    }
+    public State swapTurns() {
+        throw new RuntimeException("Game has not started yet.");
+    }
+}
+class Playing extends State {
+    String message = "Game is being played.";
+
+    Partida partida;
+
+    public Playing(Partida partida) {
         this.partida = partida;
     }
 
@@ -27,98 +116,67 @@ class EmptyGame extends State {
     }
 
     public State startGame() {
-        return Optional.ofNullable(partida.checkMinPlayers() ? new NoHead(partida) : null)
-                .orElseThrow(() -> new RuntimeException("Not enough players to start the game."));
+        throw new RuntimeException("Game is already being played.");
     }
-    public State setTopCard(Carta carta) {
-        throw new RuntimeException("Game has not started yet.");
+
+    public State setHead(Carta head) {
+        throw new RuntimeException("Game is already being played.");
     }
+
     public Partida playCard(Carta card, String desiredPlayer) {
-        throw new RuntimeException("Game has not started yet.");
-    }
-    public Partida nextTurn() {
-        throw new RuntimeException("Game has not started yet.");
-    }
-    public Partida swapDirection() {
-        throw new RuntimeException("Game has not started yet.");
+        Carta head = partida.head;
+        this.checkTurn(desiredPlayer);
+        partida.checkCardContentionAndPop(card, desiredPlayer);
+        Carta comparison = head.getComparison(card);
+        card.executeAction(partida, card);
+        partida.head = card;
+        return partida;
     }
     public void checkTurn(String desiredPlayer) {
-        throw new RuntimeException("Game has not started yet.");
+        partida.turnos.checkTurn(desiredPlayer);
+    }
+    public Partida nextTurn() {
+        partida.turnos = partida.turnos.nextTurn();
+        return partida;
+    }
+    public String  getCurrentPlayer() {
+        return partida.turnos.currentPlayer();
+    }
+    public State swapTurns() {
+        System.out.println(partida.turnos);
+        partida.turnos = partida.turnos.swapDirection(partida);
+        return this;
     }
 }
+class EndGame extends State{
+    public String message = "Game has ended.";
 
-    class NoHead extends State {
-        String message = "Game is being played.";
-
-        Partida partida;
-
-        public NoHead(Partida partida) {
-            this.partida = partida;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public State startGame() {
-            throw new RuntimeException("Game is already being played.");
-        }
-        public State setTopCard(Carta carta) {
-            partida.head = carta;
-            return new fowardGame(partida);
-        }
-        public Partida playCard(Carta card, String desiredPlayer) {
-            throw new RuntimeException("There is no head card. Set one first.");
-        }
-        public Partida nextTurn() {
-            throw new RuntimeException("There is no head card. Set one first.");
-        }
-        public Partida swapDirection() {
-            throw new RuntimeException("There is no head card. Set one first.");
-        }
-        public void checkTurn(String desiredPlayer) {
-            throw new RuntimeException("There is no head card. Set one first.");
-        }
+    public EndGame(Partida partida) {
+        this.partida = partida;
     }
-    class fowardGame extends State {
-        String message = "Game is being played.";
-
-        Partida partida;
-
-        public fowardGame(Partida partida) {
-            this.partida = partida;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public State startGame() {
-            throw new RuntimeException("Game is already being played.");
-        }
-        public State setTopCard(Carta carta) {
-            throw new RuntimeException("Can't randomly set head. Let player play.");
-        }
-        public Partida playCard(Carta card, String desiredPlayer) {
-            partida.checkTurn(desiredPlayer);
-
-            return partida;
-        }
-        public Partida nextTurn() {
-            partida.turns.nextTurn();
-            return partida;
-        }
-        public Partida swapDirection() {
-            partida.turns = partida.turns.swapDirection();
-            return partida;
-        }
-        public void checkTurn(String desiredPlayer) {
-            partida.turns.checkTurn(desiredPlayer);
-        }
+    public String getMessage() {
+        return message;
+    }
+    public State startGame() {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public State setHead(Carta head) {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public Partida playCard(Carta card, String desiredPlayer) {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public Partida nextTurn() {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public void checkTurn(String desiredPlayer) {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public String getCurrentPlayer() {
+        throw new RuntimeException("Game has already ended.");
+    }
+    public State swapTurns() {
+        throw new RuntimeException("Game has already ended.");
     }
 
-
-
-
-
-
+}
